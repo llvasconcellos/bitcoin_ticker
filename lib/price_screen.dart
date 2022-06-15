@@ -14,38 +14,41 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String _selectedCurrency = 'USD';
 
+  Widget getPicker() {
+    if (Platform.isIOS) {
+      return CupertinoPicker(
+        backgroundColor: Colors.lightBlue,
+        itemExtent: 32,
+        onSelectedItemChanged: (index) {
+          setState(() {
+            _selectedCurrency = kCurrenciesList[index];
+          });
+        },
+        children: <Widget>[
+          for (var item in kCurrenciesList) Text(item),
+        ],
+      );
+    } else {
+      return DropdownButton<String>(
+        value: _selectedCurrency,
+        onChanged: (value) {
+          setState(() {
+            _selectedCurrency = value!;
+          });
+        },
+        items: <DropdownMenuItem<String>>[
+          for (var item in kCurrenciesList)
+            DropdownMenuItem<String>(
+              value: item,
+              child: Text(item),
+            ),
+        ],
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    Widget materialDropdown = DropdownButton<String>(
-      value: _selectedCurrency,
-      onChanged: (value) {
-        setState(() {
-          _selectedCurrency = value!;
-        });
-      },
-      items: <DropdownMenuItem<String>>[
-        for (var item in kCurrenciesList)
-          DropdownMenuItem<String>(
-            value: item,
-            child: Text(item),
-          ),
-      ],
-    );
-
-    Widget cupertinoDropdown = CupertinoPicker(
-      backgroundColor: Colors.lightBlue,
-      itemExtent: 32,
-      onSelectedItemChanged: (index) {
-        setState((){
-          _selectedCurrency = kCurrenciesList[index];
-        });
-      },
-      children: <Widget>[
-        for (var item in kCurrenciesList) Text(item),
-      ],
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('🤑 Coin Ticker'),
@@ -76,11 +79,11 @@ class _PriceScreenState extends State<PriceScreen> {
             ),
           ),
           Container(
-              height: 150.0,
-              alignment: Alignment.center,
-              padding: const EdgeInsets.only(bottom: 30.0),
-              color: Colors.lightBlue,
-              child:  Platform.isAndroid ? materialDropdown : cupertinoDropdown,
+            height: 150.0,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.only(bottom: 30.0),
+            color: Colors.lightBlue,
+            child: getPicker(),
           ),
         ],
       ),
